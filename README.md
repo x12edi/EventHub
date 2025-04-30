@@ -1,7 +1,7 @@
 # EventHub
 EventHub is a modular, monolithic web application built with ASP.NET Core MVC to manage events. It serves as a demo project to demonstrate proficiency in modern .NET development, focusing on clean architecture, best practices, and essential MVC concepts. 
 
-##Project Overview
+## Project Overview
 EventHub allows users to register, log in, and manage events (create, read, update, delete). The application enforces authentication, ensuring only authorized users can access event management features. It uses a modular architecture with separated layers for presentation, business logic, and data access, showcasing patterns like Repository and Service Layer.
 Features Completed
 
