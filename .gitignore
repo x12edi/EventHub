@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/EventHub.Application/bin/Debug/net8.0
+/EventHub.Application/obj
+/EventHub.Core/bin/Debug/net8.0
+/EventHub.Core/obj
+/EventHub.Infrastructure/bin/Debug/net8.0
+/EventHub.Infrastructure/obj
+/EventHub.Web/bin/Debug/net8.0
+/EventHub.Web/obj
+/EventHub.Web.Tests/bin/Debug/net8.0
+/EventHub.Web.Tests/obj

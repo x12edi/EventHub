@@ -1,0 +1,35 @@
+﻿@model EventHub.Core.Entities.Event
+
+@{
+    ViewData["Title"] = "Event Details";
+}
+
+<h1>@Model.Title</h1>
+
+<div id="comments"></div>
+<input id="commentInput" type="text" placeholder="Add a comment" />
+<button onclick="sendComment()">Send</button>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/comments")
+            .build();
+
+        connection.on("ReceiveComment", (eventId, user, message) => {
+            if (eventId === @Model.Id) {
+                $('#comments').append(`<p>${user}: ${message}</p>`);
+            }
+        });
+
+        connection.start();
+
+        function sendComment() {
+            const message = $('#commentInput').val();
+            connection.invoke("SendComment", @Model.Id, "@User.Identity.Name", message);
+            $('#commentInput').val('');
+        }
+    </script>
+}
