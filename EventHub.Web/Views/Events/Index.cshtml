@@ -23,7 +23,7 @@
         @foreach (var evt in Model)
         {
             <tr>
-                <td>@evt.Title</td>
+                <td><a asp-action="Details" asp-route-slug="@evt.Slug">@evt.Title</a></td>
                 <td>@evt.Description</td>
                 <td>@evt.StartDate.ToString("d")</td>
                 <td>@evt.Organizer</td>

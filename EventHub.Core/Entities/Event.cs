@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Runtime.InteropServices;
 
 namespace EventHub.Core.Entities
 {
@@ -18,5 +19,8 @@ namespace EventHub.Core.Entities
 
         public string Organizer { get; set; }
         public bool IsActive { get; set; }
+
+        [StringLength(200)]
+        public string? Slug { get; set; }
     }
 }

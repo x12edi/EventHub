@@ -26,6 +26,10 @@ run below command from root of .sln folder:
 create identity related tables:
 dotnet ef migrations add AddIdentity --project EventHub.Infrastructure --startup-project EventHub.Web
 dotnet ef database update --project EventHub.Infrastructure --startup-project EventHub.Web
+-----------
+add new field slug, for custom routing:
+dotnet ef migrations add AddSlugToEvent --project EventHub.Infrastructure --startup-project EventHub.Web
+dotnet ef database update --project EventHub.Infrastructure --startup-project EventHub.Web
 
 
 

@@ -24,6 +24,10 @@ namespace EventHub.Infrastructure.Repositories
             return await _context.Events.FindAsync(id);
         }
 
+        public async Task<Event> GetBySlugAsync(string slug)
+        {
+            return await _context.Events.FirstOrDefaultAsync(e => e.Slug == slug);
+        }
         public async Task AddAsync(Event evt)
         {
             _context.Events.Add(evt);

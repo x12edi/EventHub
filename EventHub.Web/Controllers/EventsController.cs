@@ -4,10 +4,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using EventHub.Application.Services;
 using EventHub.Infrastructure.Repositories;
+using EventHub.Web.Filters;
 
 namespace EventHub.Web.Controllers
 {
     [Authorize]
+    [Route("Events")]
+    [ServiceFilter(typeof(ActionLogFilter))]
     public class EventsController : Controller
     {
         private readonly IEventRepository _repository;
@@ -18,13 +21,14 @@ namespace EventHub.Web.Controllers
             _repository = repository;
             _service = service;
         }
-
+        [Route("Create")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Route("Create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Event evt)
         {
@@ -37,7 +41,9 @@ namespace EventHub.Web.Controllers
             return View(evt);
         }
 
-        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
+        [HttpGet]
+        [Route("")]
+        [Route("Index")]
         public async Task<IActionResult> Index()
         {
             var events = await _service.GetAllAsync();
@@ -45,6 +51,7 @@ namespace EventHub.Web.Controllers
         }
 
         [HttpGet]
+        [Route("Edit/{id}")]
         public async Task<IActionResult> Edit(int id)
         {
             var evt = await _service.GetByIdAsync(id);
@@ -56,6 +63,7 @@ namespace EventHub.Web.Controllers
         }
 
         [HttpPost]
+        [Route("Edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Event evt)
         {
@@ -86,6 +94,7 @@ namespace EventHub.Web.Controllers
         }
 
         [HttpGet]
+        [Route("Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var evt = await _service.GetByIdAsync(id);
@@ -97,6 +106,7 @@ namespace EventHub.Web.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
+        [Route("Delete/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -109,6 +119,18 @@ namespace EventHub.Web.Controllers
             {
                 return NotFound();
             }
+        }
+
+        [HttpGet]
+        [Route("Details/{slug}")]
+        public async Task<IActionResult> Details(string slug)
+        {
+            var evt = await _service.GetBySlugAsync(slug);
+            if (evt == null)
+            {
+                return NotFound();
+            }
+            return View(evt);
         }
     }
 }
