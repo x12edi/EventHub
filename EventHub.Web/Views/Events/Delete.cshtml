@@ -11,7 +11,8 @@
 <div>
     <h4>Event Details</h4>
     <hr />
-    <dl class="row">
+    @await Html.PartialAsync("_EventSummary", Model)
+    @* <dl class="row">
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
@@ -42,7 +43,7 @@
         <dd class="col-sm-10">
             @(Model.IsActive ? "Active" : "Inactive")
         </dd>
-    </dl>
+    </dl> *@
 
     <form asp-action="Delete" method="post">
         <input type="hidden" asp-for="Id" />

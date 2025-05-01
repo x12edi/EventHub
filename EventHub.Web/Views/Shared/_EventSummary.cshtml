@@ -1,9 +1,11 @@
 ﻿@model EventHub.Core.Entities.Event
 
-<div class="card">
+<div class="card mb-3">
     <div class="card-body">
         <h5 class="card-title">@Model.Title</h5>
-        <p class="card-text">@Model.Description</p>
-        <p class="card-text"><small>@Model.StartDate.ToString("d")</small></p>
+        <p class="card-text"><strong>Description:</strong> @Model.Description</p>
+        <p class="card-text"><strong>Date:</strong> @Model.StartDate.ToString("d")</p>
+        <p class="card-text"><strong>Status:</strong> @(Model.IsActive ? "Active" : "Inactive")</p>
+        <p class="card-text"><strong>Organizer:</strong> @Model.Organizer</p>
     </div>
 </div>

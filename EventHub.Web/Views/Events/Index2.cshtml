@@ -1,0 +1,65 @@
+﻿@model IEnumerable<EventHub.Core.Entities.Event>
+
+@{
+    ViewData["Title"] = "Events";
+}
+
+<h1>Events</h1>
+
+<a asp-action="Create" class="btn btn-primary mb-3">Create New Event</a>
+
+<div id="eventsContainer">
+    @foreach (var evt in Model)
+    {
+        <div class="event-item">
+            @await Html.PartialAsync("_EventSummary", evt)
+            <div class="actions">
+                <button class="btn btn-sm btn-info load-details" data-id="@evt.Id">Load Details</button>
+                <a asp-action="Edit" asp-route-id="@evt.Id" class="btn btn-sm btn-warning">Edit</a>
+                <a asp-action="Delete" asp-route-id="@evt.Id" class="btn btn-sm btn-danger delete-btn" onclick="return confirm('Are you sure you want to delete this event?');">Delete</a>
+            </div>
+            <div class="details-container" style="display:none;"></div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
+    <script>
+        $(document).ready(function () {
+            $('#eventsTable').DataTable({
+                paging: true,
+                searching: true,
+                ordering: true
+            });
+
+            $('.load-details').click(function () {
+                var eventId = $(this).data('id');
+                var $detailsContainer = $(this).closest('.event-item').find('.details-container');
+
+                $.ajax({
+                    url: '/Events/GetEventDetails/' + eventId,
+                    type: 'GET',
+                    success: function (data) {
+                        $detailsContainer.html(`
+                                    <div class="card mt-2">
+                                        <div class="card-body">
+                                            <h6>Details</h6>
+                                            <p><strong>Description:</strong> ${data.description}</p>
+                                            <p><strong>Start Date:</strong> ${data.startDate}</p>
+                                            <p><strong>Organizer:</strong> ${data.organizer}</p>
+                                            <p><strong>Status:</strong> ${data.isActive}</p>
+                                        </div>
+                                    </div>
+                                `).slideDown();
+                    },
+                    error: function () {
+                        $detailsContainer.html('<p class="text-danger">Error loading details.</p>').slideDown();
+                    }
+                });
+            });
+        });
+    </script>
+}

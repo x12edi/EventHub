@@ -13,12 +13,10 @@ namespace EventHub.Web.Controllers
     [ServiceFilter(typeof(ActionLogFilter))]
     public class EventsController : Controller
     {
-        private readonly IEventRepository _repository;
         private readonly IEventService _service;
 
-        public EventsController(IEventRepository repository, IEventService service)
+        public EventsController(IEventService service)
         {
-            _repository = repository;
             _service = service;
         }
         [Route("Create")]
@@ -35,7 +33,7 @@ namespace EventHub.Web.Controllers
             if (ModelState.IsValid)
             {
                 evt.Organizer = User.Identity.Name;
-                await _repository.AddAsync(evt);
+                await _service.AddAsync(evt);
                 return RedirectToAction(nameof(Index));
             }
             return View(evt);
@@ -45,6 +43,14 @@ namespace EventHub.Web.Controllers
         [Route("")]
         [Route("Index")]
         public async Task<IActionResult> Index()
+        {
+            var events = await _service.GetAllAsync();
+            return View(events);
+        }
+
+        [HttpGet]
+        [Route("Index2")]
+        public async Task<IActionResult> Index2()
         {
             var events = await _service.GetAllAsync();
             return View(events);
@@ -131,6 +137,25 @@ namespace EventHub.Web.Controllers
                 return NotFound();
             }
             return View(evt);
+        }
+
+        [HttpGet]
+        [Route("GetEventDetails/{id}")]
+        public async Task<IActionResult> GetEventDetails(int id)
+        {
+            var evt = await _service.GetByIdAsync(id);
+            if (evt == null)
+            {
+                return NotFound();
+            }
+            return Json(new
+            {
+                title = evt.Title,
+                description = evt.Description,
+                startDate = evt.StartDate.ToString("d"),
+                organizer = evt.Organizer,
+                isActive = evt.IsActive ? "Active" : "Inactive"
+            });
         }
     }
 }

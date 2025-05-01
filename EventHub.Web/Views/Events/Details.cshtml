@@ -6,41 +6,8 @@
 
 <h1>@Model.Title</h1>
 
-<div class="card">
-    <div class="card-body">
-        <h5 class="card-title">Event Details</h5>
-        <p class="card-text"><strong>Description:</strong> @Model.Description</p>
-        <p class="card-text"><strong>Start Date:</strong> @Model.StartDate.ToString("d")</p>
-        <p class="card-text"><strong>Organizer:</strong> @Model.Organizer</p>
-        <p class="card-text"><strong>Status:</strong> @(Model.IsActive ? "Active" : "Inactive")</p>
-        <a asp-action="Index" class="btn btn-secondary">Back to Events</a>
-    </div>
+<div id="eventDetails">
+    @await Html.PartialAsync("_EventSummary", Model)
+    <p><strong>Description:</strong> @Model.Description</p>
+    <a asp-action="Index" class="btn btn-secondary">Back to Events</a>
 </div>
-
-<div id="comments"></div>
-<input id="commentInput" type="text" placeholder="Add a comment" />
-<button onclick="sendComment()">Send</button>
-
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
-    <script>
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/comments")
-            .build();
-
-        connection.on("ReceiveComment", (eventId, user, message) => {
-            if (eventId === @Model.Id) {
-                $('#comments').append(`<p>${user}: ${message}</p>`);
-            }
-        });
-
-        connection.start();
-
-        function sendComment() {
-            const message = $('#commentInput').val();
-            connection.invoke("SendComment", @Model.Id, "@User.Identity.Name", message);
-            $('#commentInput').val('');
-        }
-    </script>
-}
