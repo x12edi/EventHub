@@ -29,7 +29,8 @@
                 <td>@evt.Description</td>
                 <td>@evt.StartDate.ToString("d")</td>
                 <td>@evt.Organizer</td>
-                <td>@(evt.IsActive ? "Active" : "Inactive")</td>
+                @* <td>@(evt.IsActive ? "Active" : "Inactive")</td> *@
+                <td><event-status is-active="@evt.IsActive"></event-status></td>
                 <td>
                     <button class="btn btn-sm btn-info load-details" data-id="@evt.Id">Load Details</button>
                     <a asp-action="Edit" asp-route-id="@evt.Id" class="btn btn-sm btn-warning">Edit</a>

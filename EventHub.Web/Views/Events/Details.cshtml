@@ -9,5 +9,9 @@
 <div id="eventDetails">
     @await Html.PartialAsync("_EventSummary", Model)
     <p><strong>Description:</strong> @Model.Description</p>
+    <p><strong>Status:</strong> <event-status is-active="@Model.IsActive"></event-status></p>
+    <hr />
+    <p><strong>View Component example: </strong></p>
+    @await Component.InvokeAsync("EventSummary", new { evt = Model })
     <a asp-action="Index" class="btn btn-secondary">Back to Events</a>
 </div>

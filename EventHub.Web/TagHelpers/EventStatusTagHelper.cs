@@ -3,15 +3,19 @@
 namespace EventHub.Web.TagHelpers
 {
     [HtmlTargetElement("event-status", Attributes = "is-active")]
-    public class StatusTagHelper : TagHelper
+    public class EventStatusTagHelper : TagHelper
     {
+        [HtmlAttributeName("is-active")]
         public bool IsActive { get; set; }
 
         public override void Process(TagHelperContext context, TagHelperOutput output)
         {
             output.TagName = "span";
+            output.TagMode = TagMode.StartTagAndEndTag;
+
+            var className = IsActive ? "badge bg-success" : "badge bg-danger";
+            output.Attributes.SetAttribute("class", className);
             output.Content.SetContent(IsActive ? "Active" : "Inactive");
-            output.Attributes.Add("class", IsActive ? "badge bg-success" : "badge bg-secondary");
         }
     }
 }

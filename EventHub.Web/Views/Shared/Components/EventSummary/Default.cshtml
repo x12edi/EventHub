@@ -1,0 +1,10 @@
+﻿@model dynamic
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Title</h5>
+        <p class="card-text"><strong>Date:</strong> @Model.FormattedDate</p>
+        <p class="card-text"><strong>Organizer:</strong> @Model.Organizer</p>
+        <p class="card-text"><strong>Status:</strong> <event-status is-active="@Model.IsActive"></event-status></p>
+    </div>
+</div>
