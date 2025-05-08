@@ -157,5 +157,26 @@ namespace EventHub.Web.Controllers
                 isActive = evt.IsActive ? "Active" : "Inactive"
             });
         }
+
+        [HttpGet]
+        [Route("Search")]
+        public async Task<IActionResult> Search(string title, string status)
+        {
+            bool? isActive = status == "All" ? null : status == "Active" ? true : false;
+            var events = await _service.SearchAsync(title, isActive);
+
+            var result = events.Select(e => new
+            {
+                id = e.Id,
+                title = e.Title,
+                description = e.Description,
+                startDate = e.StartDate.ToString("d"),
+                organizer = e.Organizer,
+                isActive = e.IsActive ? "Active" : "Inactive",
+                slug = e.Slug
+            });
+
+            return Json(result);
+        }
     }
 }

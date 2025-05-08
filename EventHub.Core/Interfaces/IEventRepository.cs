@@ -10,5 +10,6 @@ namespace EventHub.Core.Interfaces
         Task AddAsync(Event evt);
         Task UpdateAsync(Event evt);
         Task DeleteAsync(int id);
+        Task<IEnumerable<Event>> SearchAsync(string title, bool? isActive);
     }
 }

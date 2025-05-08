@@ -12,6 +12,7 @@ namespace EventHub.Application.Services
         Task AddAsync(Event evt);
         Task UpdateAsync(Event evt);
         Task DeleteAsync(int id);
+        Task<IEnumerable<Event>> SearchAsync(string title, bool? isActive);
 
     }
 
@@ -67,6 +68,11 @@ namespace EventHub.Application.Services
             var slug = title.ToLower().Replace(" ", "-").Replace(".", "");
             slug = System.Text.RegularExpressions.Regex.Replace(slug, "[^a-z0-9-]", "");
             return $"{slug}-{startDate.Year}";
+        }
+
+        public async Task<IEnumerable<Event>> SearchAsync(string title, bool? isActive)
+        {
+            return await _unitOfWork.Events.SearchAsync(title, isActive);
         }
     }
 }

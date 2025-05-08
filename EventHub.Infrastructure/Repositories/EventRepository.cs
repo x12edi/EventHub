@@ -2,6 +2,8 @@
 using EventHub.Core.Interfaces;
 using EventHub.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System.Net.NetworkInformation;
 
 namespace EventHub.Infrastructure.Repositories
 {
@@ -48,6 +50,23 @@ namespace EventHub.Infrastructure.Repositories
                 _context.Events.Remove(evt);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<IEnumerable<Event>> SearchAsync(string title, bool? isActive)
+        {
+            var query = _context.Events.AsQueryable();
+
+            if (!string.IsNullOrEmpty(title))
+            {
+                query = query.Where(e => e.Title.Contains(title));
+            }
+
+            if (isActive.HasValue)
+            {
+                query = query.Where(e => e.IsActive == isActive.Value);
+            }
+
+            return await query.ToListAsync();
         }
     }
 }
