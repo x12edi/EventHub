@@ -20,6 +20,7 @@ namespace EventHub.Web.Controllers
             _service = service;
         }
         [Route("Create")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -28,6 +29,7 @@ namespace EventHub.Web.Controllers
         [HttpPost]
         [Route("Create")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(Event evt)
         {
             if (ModelState.IsValid)
@@ -143,6 +145,7 @@ namespace EventHub.Web.Controllers
         [Route("GetEventDetails/{id}")]
         public async Task<IActionResult> GetEventDetails(int id)
         {
+            Thread.Sleep(5000);
             var evt = await _service.GetByIdAsync(id);
             if (evt == null)
             {
