@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EventHub.Core.Validation;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 
 namespace EventHub.Core.Entities
@@ -7,6 +8,7 @@ namespace EventHub.Core.Entities
     {
         public int Id { get; set; }
 
+        [TitleFormat]
         [Required(ErrorMessage = "Title is required")]
         [StringLength(100)]
         public string Title { get; set; }
@@ -14,6 +16,7 @@ namespace EventHub.Core.Entities
         [Required]
         public string Description { get; set; }
 
+        [FutureDate]
         [Required]
         public DateTime StartDate { get; set; }
 

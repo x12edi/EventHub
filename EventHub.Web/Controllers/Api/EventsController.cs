@@ -1,5 +1,6 @@
 ﻿using EventHub.Application.Services;
 using EventHub.Core.Entities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace EventHub.Web.Controllers.Api
 {
     [Route("api/events")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class EventsController : ControllerBase
     {
         private readonly IEventService _eventService;

@@ -1,6 +1,8 @@
 ﻿using EventHub.Application.Services;
 using EventHub.Core.Entities;
 using EventHub.Core.Interfaces;
+using EventHub.Web.Components;
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -168,6 +170,34 @@ namespace EventHub.Web.Tests
             // Assert
             Assert.Single(result);
             Assert.Equal("Test Event", result.First().Title);
+        }
+
+        [Fact]
+        public async Task EventSummaryViewComponent_UsesCache()
+        {
+            var mockEventService = new Mock<IEventService>();
+            var mockCache = new Mock<IMemoryCache>();
+            var cacheEntry = new Mock<ICacheEntry>();
+            object cachedValue = null;
+            mockCache.Setup(c => c.CreateEntry(It.IsAny<object>())).Returns(cacheEntry.Object)
+                     .Callback<object>(key => cachedValue = key);
+            mockEventService.Setup(s => s.SearchAsync(null, true)).ReturnsAsync(new List<Event>
+            {
+                new Event { Id = 1, Title = "Test Event", StartDate = new DateTime(2025, 5, 10), IsActive = true }
+            });
+
+            var component = new EventSummaryViewComponent(mockEventService.Object, mockCache.Object);
+
+            await component.InvokeAsync();
+
+            mockCache.Verify(c => c.TryGetValue("EventSummary", out It.Ref<object>.IsAny), Times.Once());
+            mockEventService.Verify(s => s.SearchAsync(null, true), Times.Once());
+
+            // Simulate cache hit
+            mockCache.Setup(c => c.TryGetValue("EventSummary", out It.Ref<object>.IsAny)).Returns(true);
+            await component.InvokeAsync();
+
+            mockEventService.Verify(s => s.SearchAsync(null, true), Times.Once()); // Should not call again
         }
     }
 }

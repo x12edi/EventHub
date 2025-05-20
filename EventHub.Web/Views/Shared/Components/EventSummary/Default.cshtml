@@ -1,10 +1,26 @@
-﻿@model dynamic
+﻿@model IEnumerable<EventHub.Core.Entities.Event>
 
 <div class="card mb-3">
+    <div class="card-header">
+        <h5>Upcoming Events <span class="badge bg-primary">@Model.Count()</span></h5>
+    </div>
     <div class="card-body">
-        <h5 class="card-title">@Model.Title</h5>
-        <p class="card-text"><strong>Date:</strong> @Model.FormattedDate</p>
-        <p class="card-text"><strong>Organizer:</strong> @Model.Organizer</p>
-        <p class="card-text"><strong>Status:</strong> <event-status is-active="@Model.IsActive"></event-status></p>
+        @if (Model.Any())
+        {
+            <ul class="list-group">
+                @foreach (var evt in Model)
+                {
+                    <li class="list-group-item">
+                        <a asp-controller="Events" asp-action="Details" asp-route-slug="@evt.Slug">@evt.Title</a>
+                        <br />
+                        <small>@evt.StartDate.ToString("d") - @evt.Organizer</small>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No upcoming events found.</p>
+        }
     </div>
 </div>

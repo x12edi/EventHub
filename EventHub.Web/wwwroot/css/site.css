@@ -60,3 +60,20 @@ tr.shown .details-control::before {
     color: #f8f9fa;
     font-size: 0.9rem;
 }
+
+.list-group-item {
+    padding: 0.75rem 1.25rem;
+}
+
+.list-group-item a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.list-group-item a:hover {
+    text-decoration: underline;
+}
+
+.card-header h5 {
+    margin: 0;
+}

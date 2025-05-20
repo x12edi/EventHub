@@ -19,6 +19,7 @@ namespace EventHub.Web.Controllers
         {
             _service = service;
         }
+        [HttpGet]
         [Route("Create")]
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
