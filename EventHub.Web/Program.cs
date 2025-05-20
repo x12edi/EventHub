@@ -4,13 +4,26 @@ using EventHub.Infrastructure.Data;
 using EventHub.Infrastructure.Repositories;
 using EventHub.Web.Filters;
 using EventHub.Web.Middleware;
+using EventHub.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc;
+using AspNetCoreRateLimit;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add rate limiting services
+builder.Services.AddMemoryCache();
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
+builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddInMemoryRateLimiting();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -25,7 +38,17 @@ builder.Services.AddScoped<ActionLogFilter>();
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-builder.Services.AddMemoryCache(); //in production use redis
+//builder.Services.AddMemoryCache(); //in production use redis
+builder.Services.AddHostedService<EventReminderService>(); // Add background service
+
+// Add API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new Microsoft.AspNetCore.Mvc.Versioning.UrlSegmentApiVersionReader();
+});
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
@@ -70,7 +93,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Add Swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "EventHub API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "EventHub API v1", Version = "v1" });
+    c.SwaggerDoc("v2", new OpenApiInfo { Title = "EventHub API v2", Version = "v2" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -97,6 +121,19 @@ builder.Services.AddSwaggerGen(c =>
     c.IgnoreObsoleteActions();
     c.IgnoreObsoleteProperties();
     c.CustomSchemaIds(type => type.FullName);
+    // Include version in Swagger
+    c.DocInclusionPredicate((docName, apiDesc) =>
+    {
+        if (!apiDesc.ActionDescriptor.EndpointMetadata.Any(m => m is ApiVersionAttribute))
+            return true;
+
+        var versions = apiDesc.ActionDescriptor.EndpointMetadata
+            .OfType<ApiVersionAttribute>()
+            .SelectMany(a => a.Versions)
+            .Select(v => $"v{v.ToString()}");
+
+        return versions.Any(v => v == docName);
+    });
 });
 
 var app = builder.Build();
@@ -119,11 +156,19 @@ if (!app.Environment.IsDevelopment())
 else
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "EventHub API v1");
+        c.SwaggerEndpoint("/swagger/v2/swagger.json", "EventHub API v2");
+        c.RoutePrefix = "swagger";
+    });
 }
 
 app.UseStaticFiles();
 app.UseRouting();
+// Add rate limiting middleware
+app.UseIpRateLimiting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 // Add custom middleware

@@ -6,11 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+
 namespace EventHub.Web.Controllers.Api
 {
-    [Route("api/events")]
+    //[Route("api/events")]
+    [Route("api/v{version:apiVersion}/events")]
     [ApiController]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     public class EventsController : ControllerBase
     {
         private readonly IEventService _eventService;
@@ -27,6 +31,30 @@ namespace EventHub.Web.Controllers.Api
             var events = await _eventService.GetAllAsync();
             return Ok(events);
         }
+
+        [HttpGet]
+        [MapToApiVersion("1.0")]
+        public async Task<ActionResult<IEnumerable<Event>>> GetEventsV1()
+        {
+            var events = await _eventService.GetAllAsync();
+            return Ok(events);
+        }
+
+        [HttpGet]
+        [MapToApiVersion("2.0")]
+        public async Task<ActionResult<IEnumerable<EventSummaryDto>>> GetEventsV2()
+        {
+            var events = await _eventService.GetAllAsync();
+            var summaries = events.Select(e => new EventSummaryDto
+            {
+                Id = e.Id,
+                Title = e.Title,
+                StartDate = e.StartDate,
+                IsActive = e.IsActive
+            });
+            return Ok(summaries);
+        }
+
 
         // GET: api/events/5
         [HttpGet("{id}")]
@@ -91,5 +119,13 @@ namespace EventHub.Web.Controllers.Api
                 return NotFound();
             }
         }
+    }
+
+    public class EventSummaryDto
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public DateTime StartDate { get; set; }
+        public bool IsActive { get; set; }
     }
 }
