@@ -13,6 +13,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc;
 using AspNetCoreRateLimit;
+using EventHub.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,9 @@ builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounte
 builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
 builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 builder.Services.AddInMemoryRateLimiting();
+
+// Add SignalR services
+builder.Services.AddSignalR();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -173,6 +177,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 // Add custom middleware
 app.UseRequestLogging();
+
+// Map SignalR hub
+app.MapHub<EventHubb>("/eventHubb");
 
 app.MapControllerRoute(
     name: "default",

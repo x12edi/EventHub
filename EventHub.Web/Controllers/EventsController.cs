@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using EventHub.Application.Services;
 using EventHub.Infrastructure.Repositories;
 using EventHub.Web.Filters;
+using Microsoft.AspNetCore.SignalR;
+using EventHub.Web.Hubs;
 
 namespace EventHub.Web.Controllers
 {
@@ -14,11 +16,13 @@ namespace EventHub.Web.Controllers
     public class EventsController : Controller
     {
         private readonly IEventService _service;
-
-        public EventsController(IEventService service)
+        private readonly IHubContext<EventHubb> _hubContext;
+        public EventsController(IEventService service, IHubContext<EventHubb> hubContext)
         {
             _service = service;
+            _hubContext = hubContext;
         }
+
         [HttpGet]
         [Route("Create")]
         [Authorize(Roles = "Admin")]
@@ -37,6 +41,7 @@ namespace EventHub.Web.Controllers
             {
                 evt.Organizer = User.Identity.Name;
                 await _service.AddAsync(evt);
+                await _hubContext.Clients.All.SendAsync("ReceiveEventNotification", evt.Title);
                 return RedirectToAction(nameof(Index));
             }
             return View(evt);
