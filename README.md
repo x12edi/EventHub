@@ -45,11 +45,32 @@ Event entity with validation attributes (e.g., [Required]).
 Interfaces (IEventRepository, IEventService) for dependency injection.
 
 ## Technologies Used
-Backend: ASP.NET Core 8.0, C#, Entity Framework Core
-Frontend: Razor Views, Bootstrap 5, jQuery, DataTables.js, jQuery Validation
-Database: SQL Server (via EF Core)
-Authentication: ASP.NET Core Identity
-Patterns: Repository, Service Layer, Dependency Injection
+Backend:
+- ASP.NET Core 8.0: Web framework for MVC and API development.
+- C#: Primary programming language.
+- Entity Framework Core: ORM for database operations with uow pattern.
+- AspNetCoreRateLimit: API rate limiting to control request frequency.
+- Microsoft.AspNetCore.SignalR: Real-time communication for notifications.
+- Microsoft.AspNetCore.Mvc.Versioning: API versioning for backward compatibility.
+- Microsoft.AspNetCore.Identity: Authentication and authorization.
+- Microsoft.AspNetCore.Authentication.JwtBearer: JWT-based API authentication.
+- Microsoft.Extensions.Logging: Logging for diagnostics.
+- Moq: Mocking framework for unit testing.
+- Database: SQL Server: Relational database via EF Core.
+
+Frontend:
+- Razor Views: Server-side rendering for MVC.
+- Bootstrap 5: Responsive UI framework.
+- jQuery: DOM manipulation and AJAX.
+- DataTables.js: Enhanced table functionality with sorting and filtering.
+- jQuery Validation: Client-side form validation.
+- Toastr.js: Toast notifications for real-time alerts.
+- SignalR JavaScript Client: Real-time client for notifications.
+
+Tools & Testing
+- Swagger (Swashbuckle): API documentation and testing.
+- xUnit: Unit and integration testing framework.
+- Microsoft.AspNetCore.Mvc.Testing: Integration testing for APIs and MVC.
 
 ## Setup Instructions
 Prerequisites
